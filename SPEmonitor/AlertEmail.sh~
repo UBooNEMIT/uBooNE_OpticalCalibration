@@ -1,0 +1,17 @@
+echo $1 | mail -s 'Monitor Auto-email update' jarrett@mit.edu
+
+#echo 'Hi person who is interested in the welfare of the uBooNE PMTs, the monitor has flagged one or more of the tubes as having potentially odd behavior. The algorithm for detecting these problems are simple and a bit conservative so please give it a pair of human eyes to see if you think this needs to be addressed further. The monitor is here if you dont have the link
+
+# http://www-microboone.fnal.gov/at_work/operations/PMTmonitor/MakeMonitorPage.html' | mail -s 'Monitor Auto-email update' taritree.wongjirad@gmail.com
+
+#echo 'Hi person who is interested in the welfare of the uBooNE PMTs, the monitor has flagged one or more of the tubes as having potentially odd behavior. The algorithm for detecting these problems are simple and a bit conservative so please give it a pair of human eyes to see if you think this needs to be addressed further. The monitor is here if you dont have the link
+
+ #http://www-microboone.fnal.gov/at_work/operations/PMTmonitor/MakeMonitorPage.html' | mail -s 'Monitor Auto-email update' andrew.furmanski@manchester.ac.uk
+
+#echo 'Hi person who is interested in the welfare of the uBooNE PMTs, the monitor has flagged one or more of the tubes as having potentially odd behavior. The algorithm for detecting these problems are simple and a bit conservative so please give it a pair of human eyes to see if you think this needs to be addressed further. The monitor is here if you dont have the link
+
+ #http://www-microboone.fnal.gov/at_work/operations/PMTmonitor/MakeMonitorPage.html' | mail -s 'Monitor Auto-email update' Matthew.Bass@physics.ox.ac.uk
+
+
+
+

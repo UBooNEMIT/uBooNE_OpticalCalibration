@@ -1,0 +1,170 @@
+export OPTICAL_PATH=/uboone/app/users/moon/OpticalStudies/v05_01_01/workdir/SPEmonitor
+export SETUPS_PATH=/uboone/app/users/moon/setup
+export DATA_PATH=/pnfs/uboone/scratch/users/moon/SPEmonitorData 
+
+emptysize=40000
+
+source $SETUPS_PATH/setup_kinit.sh
+source $SETUPS_PATH/setup_lar.sh
+source $SETUPS_PATH/setup_proxy.sh
+source $SETUPS_PATH/setup_larlite.sh
+
+python $OPTICAL_PATH/SAMlist.py
+
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --clean
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --submit
+
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --clean
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --submit
+
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --clean
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --submit
+
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --clean
+project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --submit
+
+sleep 10m
+
+tries=1
+bad1=0
+bad2=0
+bad3=0
+bad4=0
+good1=0
+good2=0
+good3=0
+good4=0
+while [ 1 -lt 2 ]; do
+   
+    if ls $DATA_PATH/DoSPEanalysis1/*/TFile* 1> /dev/null 2>&1; then
+	let bad1=1
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --clean
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --submit
+    else
+	let bad1=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis2/*/TFile* 1> /dev/null 2>&1; then
+	let bad2=1
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --clean
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --submit
+    else
+	let bad2=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis3/*/TFile* 1> /dev/null 2>&1; then
+	let bad3=1
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --clean
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --submit
+    else
+	let bad3=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis4/*/TFile* 1> /dev/null 2>&1; then
+	let bad4=1
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --clean
+	project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --submit
+    else
+	let bad4=0
+    fi
+
+
+
+    if ls $DATA_PATH/DoSPEanalysis1/*/SPEcalibration_output.root 1> /dev/null 2>&1; then
+
+	file1=$(echo $DATA_PATH/DoSPEanalysis1/*/SPEcalibration_output.root)
+	actualsize1=$(wc -c <"$file1")
+	if [ $actualsize1 -lt $emptysize ]; then
+	    let bad1=1
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --clean
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor1.xml --stage DoSPEanalysis1 --submit
+
+	else
+	    let good1=1
+	fi
+    else
+	let good1=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis2/*/SPEcalibration_output.root 1> /dev/null 2>&1; then
+
+	file2=$(echo $DATA_PATH/DoSPEanalysis2/*/SPEcalibration_output.root)
+	actualsize2=$(wc -c <"$file2")
+	if [ $actualsize2 -lt $emptysize ]; then
+	    let bad2=1
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --clean
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor2.xml --stage DoSPEanalysis2 --submit
+
+	else
+	    let good2=1
+	fi
+    else
+	let good2=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis3/*/SPEcalibration_output.root 1> /dev/null 2>&1; then
+
+	file3=$(echo $DATA_PATH/DoSPEanalysis3/*/SPEcalibration_output.root)
+	actualsize3=$(wc -c <"$file3")
+	if [ $actualsize3 -lt $emptysize ]; then
+	    let bad3=1
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --clean
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor3.xml --stage DoSPEanalysis3 --submit
+
+	else
+	    let good3=1
+	fi
+
+    else
+	let good3=0
+    fi
+
+    if ls $DATA_PATH/DoSPEanalysis4/*/SPEcalibration_output.root 1> /dev/null 2>&1; then
+
+	file4=$(echo $DATA_PATH/DoSPEanalysis4/*/SPEcalibration_output.root)
+	actualsize4=$(wc -c <"$file4")
+	if [ $actualsize4 -lt $emptysize ]; then
+	    let bad4=1
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --clean
+	    project.py --xml $OPTICAL_PATH/xml/SPEmonitor4.xml --stage DoSPEanalysis4 --submit
+
+	else
+	    let good4=1
+	fi
+
+    else
+	let good4=0
+    fi
+
+
+    if [ $tries -gt 50 ]; then
+	break
+    fi
+
+
+    if ( [ $good1 -eq 1 ] && [ $good2 -eq 1 ] && [ $good3 -eq 1 ] && [ $good4 -eq 1 ] && [ $bad1 -eq 0 ] && [ $bad2 -eq 0 ] && [ $bad3 -eq 0 ] && [ $bad4 -eq 0 ] ); then
+	break
+    fi
+
+    let tries=tries+1
+    let gridruntime=gridruntime+20
+    echo $gridruntime
+    sleep 10m
+
+done
+
+
+rm $OPTICAL_PATH/SPE_TreePath.txt
+
+find $DATA_PATH/DoSPEanalysis1/*/ -name "SPEcalibration_output.root" > $OPTICAL_PATH/SPE_TreePath.txt
+find $DATA_PATH/DoSPEanalysis2/*/ -name "SPEcalibration_output.root" >> $OPTICAL_PATH/SPE_TreePath.txt
+find $DATA_PATH/DoSPEanalysis3/*/ -name "SPEcalibration_output.root" >> $OPTICAL_PATH/SPE_TreePath.txt
+find $DATA_PATH/DoSPEanalysis4/*/ -name "SPEcalibration_output.root" >> $OPTICAL_PATH/SPE_TreePath.txt
+
+root -l -q -b '/uboone/app/users/moon/OpticalStudies/v05_01_01/workdir/SPEmonitor/RunFits.cc()'
+root -l -q -b '/uboone/app/users/moon/OpticalStudies/v05_01_01/workdir/SPEmonitor/RunSinglesFits.cc()'
+
+source $SETUPS_PATH/setup_kinit.sh
+python $OPTICAL_PATH/MakeDateList.py
+python $OPTICAL_PATH/PlotsGenerator.py 
+python $OPTICAL_PATH/SinglesPlotsGenerator.py

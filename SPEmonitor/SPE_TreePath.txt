@@ -1,0 +1,4 @@
+/pnfs/uboone/scratch/users/moon/SPEmonitorData/DoSPEanalysis1/9497926_0/SPEcalibration_output.root
+/pnfs/uboone/scratch/users/moon/SPEmonitorData/DoSPEanalysis2/9489888_0/SPEcalibration_output.root
+/pnfs/uboone/scratch/users/moon/SPEmonitorData/DoSPEanalysis3/9489918_0/SPEcalibration_output.root
+/pnfs/uboone/scratch/users/moon/SPEmonitorData/DoSPEanalysis4/9489943_0/SPEcalibration_output.root

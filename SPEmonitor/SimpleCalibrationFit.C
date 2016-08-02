@@ -1,0 +1,61 @@
+std::vector<double> SimpleCalibrationFit(TString input_filename, int channel_num) {
+
+  gROOT->Reset();
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(0);
+
+  TString input_tree_name = "specalib/pulsetree";                        // Whatever the tree from the swizzler is called
+  string charge           = "charge";                                    // Whatever integrated peaks are called in the swizzled tree
+  string amplitude        = "maxamp";                                    // Whatever peak maxima are called in the swizzled tree
+  string baselinerms      = "baselinerms";                               // Whatever the baseline rms for the pre charge region is called in swizzled tree
+  string baselinerms2     = "baselinerms2";                              // Whatever the baseline rms for the post charge region is called in swizzled tree
+  string channel          = "opchannel";                                 // Whatever the channel number is called in the swizzled tree
+
+
+  int amp_min             = 5;                                           // Determines where the pedestal region ends for amplitude
+  int amp_max             = 50;                                          // Determines where the region to be fit ends for amplitude
+  int baseline_cutoff     = 3;                                           // Determines the maximum variability in baseline allowed
+  
+  TFile* in_file = new TFile(input_filename.Data());                     // Get input file output from swizzler
+  TTree* in_tree = (TTree*)in_file->Get(input_tree_name);                // Get tree with PMT waveforms and data from input file
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// This following segment histograms the charge and amplitudes and obtains an estimate for the position of the SPE peak to be                                  
+// used to seed the actual fit later.                                                                                                                          
+
+  TH1D* amp_histo    = new TH1D("amp_histo","Amplitude Histogram",100,0,50);
+
+  char buffer1[300];
+  sprintf(buffer1,"%s>%i && %s <%i && %s<%i && %s<%i && %s==%i",amplitude.c_str(),amp_min,amplitude.c_str(),amp_max,baselinerms.c_str(),baseline_cutoff,baselinerms2.c_str(),baseline_cutoff,channel.c_str(),channel_num);
+
+  in_tree->Project("amp_histo",amplitude.c_str(),buffer1,"goff",in_tree->GetEntries());
+
+  double spe_amp_estimate = amp_histo->GetXaxis()->GetBinCenter(amp_histo->GetMaximumBin());
+
+    
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+// Performs the actual fitting, seeding with the estimates made above                                                                                         
+
+  TH1F* amp_fit_histo = new TH1F("amp_fit_histo","Amplitude Histogram With Fit",100,0,50);
+
+  char buffer8[300];
+  sprintf(buffer8,"%s < %i && %s > %i && %s < %i && %s < %i && %s==%i",amplitude.c_str(),amp_max,amplitude.c_str(),amp_min,baselinerms.c_str(),baseline_cutoff,baselinerms2.c_str(),baseline_cutoff,channel.c_str(),channel_num);
+
+  in_tree->Project("amp_fit_histo",amplitude.c_str(),buffer8,"goff",in_tree->GetEntries());
+
+  
+  double singl = amp_fit_histo->GetMean(1);
+  double sigma = amp_fit_histo->GetRMS(1);
+
+  std::cout<<singl<<","<<sigma<<std::endl;
+  
+  std::vector<double> output;
+
+  output.push_back(singl);
+  output.push_back(sigma);
+
+
+  return output;
+}

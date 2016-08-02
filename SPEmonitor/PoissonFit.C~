@@ -1,0 +1,60 @@
+Double_t poisson(Double_t * x, Double_t * par) 
+{
+
+  double norm     = par[0];
+  double mu       = par[1]; 
+
+  return norm*TMath::Poisson(x[0],mu);
+
+}
+
+
+std::vector<double> PoissonFit(TString input_filename,int channel_num) {
+
+  gROOT->Reset();
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(0);
+
+  TString input_tree_name = "specalib/eventtree";                        // Whatever the tree from the swizzler is called
+    
+
+  TFile* in_file = new TFile(input_filename.Data());                     // Get input file output from swizzler
+  TTree* in_tree = (TTree*)in_file->Get(input_tree_name);                // Get tree with PMT waveforms and data from input file
+
+
+  ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(15000);  // Raises maximum minimization calls, decreases likelikhood of early termination
+
+  TH1F* singles_histo = new TH1F("singles_histo","Fires in Window",20,0,20);
+
+  char buffer[100];
+  sprintf(buffer,"opchannel == %i",channel_num);
+
+  
+  in_tree->Project("singles_histo","nchfires",buffer,"goff",in_tree->GetEntries());
+
+  
+  TF1* singles_fit  = new TF1("singles_fit",poisson,0,20,2);
+  singles_fit->SetNpx(1000);
+
+  Double_t pars[2] = {10,2};
+  singles_fit->SetParNames("norm","mu");
+  singles_fit->SetParameters(pars);
+
+
+  TCanvas *c1 = new TCanvas("c1","",10,10,800,600);
+  c1->cd();
+  c1->SetLogy();
+  singles_histo->Fit("singles_fit","R");
+  
+
+  double mu = singles_fit->GetParameter(1);
+  double mu_sig = singles_fit->GetParError(1);
+
+  std::vector<double> output;
+
+  output.push_back(mu);
+  output.push_back(mu_sig);
+
+  return output;
+
+}

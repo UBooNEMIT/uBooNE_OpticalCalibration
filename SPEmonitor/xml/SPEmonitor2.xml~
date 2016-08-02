@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE project [
+<!ENTITY release "v05_01_01">
+<!ENTITY tag     "SPE_Calibration">
+<!ENTITY name    "SPE_Calibration">
+<!ENTITY user "moon">
+<!ENTITY runnum "001">
+<!ENTITY data_dir     "/pnfs/uboone/scratch/users/moon/SPEmonitorData">
+<!ENTITY local_dir    "/uboone/app/users/moon/OpticalStudies/v05_01_01/workdir/SPEmonitor">
+<!ENTITY software_dir "/uboone/app/users/moon/OpticalStudies/v05_01_01/srcs/uboonecode/uboone/Calibrations/Optical/fcl" >
+]>
+                      
+
+<job>
+<project name="&name;">
+
+  <group>uboone</group>
+  <os>SL6</os>
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>e9:prof</qual>
+    <local>/uboone/app/users/moon/OpticalStudies/v05_01_01/moon_v05_01_01_tar.tar</local>
+  </larsoft>
+
+  <!-- Project size -->
+  <numevents>20000</numevents>
+
+  <stage name="DoSPEanalysis2">
+    <inputdef>second_recent</inputdef>
+    <fcldir>&software_dir;</fcldir>
+    <fcl>run_SPEcalibration_module.fcl</fcl>
+    <numjobs>1</numjobs>
+    <outdir>&data_dir;/DoSPEanalysis2</outdir>
+    <logdir>&data_dir;/prod_log/DoSPEanalysis2</logdir>
+    <workdir>&data_dir;/prod_work/DoSPEanalysis2</workdir>
+    <memory>10000</memory> 
+    <maxfilesperjob>10</maxfilesperjob>
+  </stage>
+
+  <filetype>calibration</filetype>
+
+  <runtype>physics</runtype>
+
+</project>
+</job>
